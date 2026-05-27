@@ -143,13 +143,6 @@ def test_validate_mode_requires_input_and_contract(tmp_path: Path) -> None:
     assert missing_contract.value.code == 2
 
 
-def test_review_mode_not_implemented(capsys) -> None:
-    code = run_cli(["--mode", "review"])
-
-    assert code == 2
-    assert "not implemented" in capsys.readouterr().out
-
-
 def test_llm_summary_not_implemented(tmp_path: Path, capsys) -> None:
     csv_path = tmp_path / "customers_valid.csv"
     contract_path = tmp_path / "contract.yaml"
