@@ -87,3 +87,25 @@ class DataContract:
     columns: dict[str, ColumnContract] = field(default_factory=dict)
     row_count: RowCountRule | None = None
     uniqueness: list[UniquenessRule] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class ValidationFinding:
+    finding_id: str
+    rule_type: str
+    column: str | None
+    columns: list[str] = field(default_factory=list)
+    severity: str = "error"
+    status: str = "failed"
+    message: str = ""
+    evidence: dict[str, object] = field(default_factory=dict)
+    suggested_action: str | None = None
+
+
+@dataclass(slots=True)
+class ValidationResult:
+    contract_name: str
+    dataset_name: str
+    row_count: int
+    column_count: int
+    findings: list[ValidationFinding] = field(default_factory=list)

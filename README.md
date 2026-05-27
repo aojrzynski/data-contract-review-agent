@@ -8,7 +8,7 @@ This early scaffold currently supports:
 - validating contract structure with clear fail-fast errors
 - deterministic dataset profiling / observed evidence extraction
 
-Deterministic dataset-vs-contract validation checks are the next phase.
+Deterministic dataset-vs-contract validation checks are now implemented.
 
 ## Testing
 Tests run locally with:
