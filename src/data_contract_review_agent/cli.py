@@ -6,6 +6,7 @@ import argparse
 
 from data_contract_review_agent.contract_loader import load_contract
 from data_contract_review_agent.intake import load_dataset
+from data_contract_review_agent.profiling import build_dataset_profile
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -63,6 +64,18 @@ def main() -> int:
         print(f"columns: {metadata.column_count}")
         print(f"contract: {contract.contract.name}")
         print(f"contract_version: {contract.contract.version}")
+
+        profile = build_dataset_profile(dataframe, metadata)
+        observed_counts: dict[str, int] = {}
+        for column_profile in profile.columns.values():
+            observed = column_profile.observed_logical_type
+            observed_counts[observed] = observed_counts.get(observed, 0) + 1
+
+        observed_summary = ", ".join(
+            f"{observed}={count}" for observed, count in sorted(observed_counts.items())
+        )
+        print(f"profiled_columns: {len(profile.columns)}")
+        print(f"observed_types: {observed_summary}")
     else:
         print(f"input: {args.input}")
         print(f"contract: {args.contract}")
