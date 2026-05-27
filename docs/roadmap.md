@@ -12,10 +12,10 @@
 - CLI validate mode end-to-end.
 - Bounded deterministic review mode.
 - CI with `python -m pytest`.
+- Optional LLM-polished summary layer with deterministic fallback when OpenAI is unavailable.
 
 ## Possible next steps
 
-- Optional LLM-polished summary layer.
 - Richer sample domains beyond customer data.
 - Row-level evidence exports for selected validators.
 - HTML report output for easier sharing.

@@ -8,7 +8,7 @@ Data contracts are useful only when teams can check them consistently against re
 
 Many AI agent demos overuse LLMs for work that should stay deterministic. This project demonstrates a safer pattern: deterministic validation is the source of truth, while interpretation/orchestration stays around that evidence.
 
-LLM support may be added later as a polish layer, not as an authority layer.
+Optional LLM-polished summaries are supported as a wording layer, never an authority layer.
 
 ## What it does
 
@@ -26,7 +26,7 @@ LLM support may be added later as a polish layer, not as an authority layer.
 Install editable with dev dependencies:
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,llm]"
 ```
 
 Run tests:
@@ -68,7 +68,7 @@ python -m data_contract_review_agent.cli --input sample_data/customers/customers
 - Deterministic checks are authoritative.
 - Review mode is orchestration only.
 - Suggested contract updates are not applied automatically.
-- No LLM is used in the current version.
+- LLM summary is optional (`--llm-summary`) and non-authoritative.
 - Local-first and easy to run.
 
 ## Project status
@@ -84,3 +84,12 @@ This is a portfolio/demo project (Agent 4 in a staged suite) built to be practic
 - [Roadmap](docs/roadmap.md)
 - [Portfolio summary](docs/portfolio_summary.md)
 - [Example commands](docs/example_commands.md)
+
+
+Optional LLM summary command:
+
+```bash
+python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode review --output-dir outputs/customers_review_llm --fail-on never --llm-summary
+```
+
+Without `OPENAI_API_KEY`, the CLI writes a deterministic fallback `llm_summary.md` and continues normally.

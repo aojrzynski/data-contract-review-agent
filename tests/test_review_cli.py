@@ -70,6 +70,19 @@ def test_review_artifact_map_includes_agent_artifacts(tmp_path: Path) -> None:
     assert 'agent_trace_json' in trace_payload['artifacts']
 
 
-def test_llm_summary_still_not_implemented() -> None:
-    code = run_cli(['--llm-summary'])
-    assert code == 2
+def test_review_mode_llm_summary_writes_artifact(tmp_path: Path, capsys, monkeypatch) -> None:
+    output_dir = tmp_path / 'review_outputs'
+    monkeypatch.delenv('OPENAI_API_KEY', raising=False)
+    code = run_cli([
+        '--mode', 'review',
+        '--input', str(ROOT / 'sample_data/customers/customers_contract_failures.csv'),
+        '--contract', str(ROOT / 'config/examples/customer_contract.yaml'),
+        '--output-dir', str(output_dir),
+        '--fail-on', 'never',
+        '--llm-summary',
+    ])
+    assert code == 0
+    assert (output_dir / 'llm_summary.md').exists()
+    out = capsys.readouterr().out
+    assert 'llm_summary:' in out
+    assert 'llm_used:' in out
