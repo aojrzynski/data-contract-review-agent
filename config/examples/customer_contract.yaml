@@ -1,0 +1,65 @@
+contract:
+  name: customer_master_contract
+  version: 1.0.0
+  owner: data_governance_team
+  description: Expected structure and quality rules for the customer master extract.
+
+dataset:
+  expected_name: customer_master
+  format: tabular
+  grain: one row per customer
+  severity_defaults:
+    missing_required_column: error
+    unexpected_column: warning
+    type_mismatch: error
+    nullability_violation: error
+    uniqueness_violation: error
+    allowed_values_violation: error
+    range_violation: error
+    pattern_violation: warning
+    freshness_violation: warning
+
+schema:
+  allow_unexpected_columns: false
+
+columns:
+  customer_id:
+    required: true
+    type: string
+    nullable: false
+    unique: true
+    pattern: "^CUST-[0-9]{6}$"
+    description: Stable customer identifier.
+  customer_name:
+    required: true
+    type: string
+    nullable: false
+  email:
+    required: true
+    type: string
+    nullable: false
+  signup_date:
+    required: true
+    type: date
+    nullable: false
+  active:
+    required: true
+    type: boolean
+    nullable: false
+  updated_at:
+    required: true
+    type: datetime
+    nullable: false
+    freshness:
+      max_age_days: 30
+      reference: max_value
+
+row_count:
+  min: 1
+  max: 1000000
+  severity: warning
+
+uniqueness:
+  - name: unique_customer_id
+    columns: [customer_id]
+    severity: error

@@ -1,12 +1,11 @@
-"""CLI entrypoint for the Data Contract Review Agent.
-
-For now this is only a scaffold. The real validation and review logic will be
-added in later phases.
-"""
+"""CLI entrypoint for the Data Contract Review Agent."""
 
 from __future__ import annotations
 
 import argparse
+
+from data_contract_review_agent.contract_loader import load_contract
+from data_contract_review_agent.intake import load_dataset
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -55,10 +54,20 @@ def main() -> int:
 
     print("Data Contract Review Agent scaffold")
     print(f"mode: {args.mode}")
-    print(f"input: {args.input}")
-    print(f"contract: {args.contract}")
-    print(f"output_dir: {args.output_dir}")
 
+    if args.input and args.contract:
+        dataframe, metadata = load_dataset(args.input, sheet=args.sheet)
+        contract = load_contract(args.contract)
+        print(f"dataset: {metadata.file_name}")
+        print(f"rows: {metadata.row_count}")
+        print(f"columns: {metadata.column_count}")
+        print(f"contract: {contract.contract.name}")
+        print(f"contract_version: {contract.contract.version}")
+    else:
+        print(f"input: {args.input}")
+        print(f"contract: {args.contract}")
+
+    print(f"output_dir: {args.output_dir}")
     return 0
 
 
