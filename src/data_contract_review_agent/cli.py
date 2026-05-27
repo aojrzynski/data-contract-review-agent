@@ -150,6 +150,8 @@ def run_cli(argv: list[str] | None = None) -> int:
     review_result = None
     if args.mode == "review":
         artifacts.update(_expected_review_artifacts(args.output_dir))
+        if args.llm_summary:
+            artifacts["llm_summary"] = output_dir / "llm_summary.md"
         review_result = run_review_mode(
             validation_result=pipeline.validation_result,
             classified_result=pipeline.classified_result,

@@ -85,7 +85,10 @@ def test_failing_customer_example_non_blocking_with_fail_on_never(tmp_path: Path
         assert (output_dir / artifact).exists()
 
     results = json.loads((output_dir / "contract_validation_results.json").read_text(encoding="utf-8"))
-    assert results["summary"]["total_findings"] > 0
+    assert results["summary"]["total_findings"] == 8
+    assert results["summary"]["by_severity"]["error"] == 5
+    assert results["summary"]["by_severity"]["warning"] == 3
+    assert results["summary"]["by_rule_type"]["uniqueness_violation"] == 1
 
     report = (output_dir / "contract_validation_report.md").read_text(encoding="utf-8")
     assert "Overall status" in report

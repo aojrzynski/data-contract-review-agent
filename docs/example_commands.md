@@ -59,4 +59,4 @@ python -m data_contract_review_agent.cli \
 python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode review --output-dir outputs/customers_review_llm --fail-on never --llm-summary
 ```
 
-If `OPENAI_API_KEY` is missing, the command still succeeds and writes a deterministic fallback `llm_summary.md`.
+If `OPENAI_API_KEY` is missing, the command still succeeds and writes a deterministic fallback `llm_summary.md`. The summary is optional wording polish and does not change validation evidence, recommendations, or exit codes.

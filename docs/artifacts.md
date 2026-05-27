@@ -35,9 +35,9 @@ This project writes traceable artifacts so both humans and automation can inspec
 ## `agent_trace.json`
 - **What it is:** Structured trace of review-mode orchestration steps.
 - **Who it is for:** Auditors, reviewers, and maintainers.
-- **When to use it:** Demonstrating that review mode is bounded and deterministic; this trace proves no LLM was used.
+- **When to use it:** Demonstrating that review mode is bounded and deterministic. Validation evidence and recommendations remain deterministic even when an optional `llm_summary.md` is requested.
 
 ## `llm_summary.md`
 - **What it is:** Optional markdown wording polish generated from deterministic summary inputs.
 - **Who it is for:** Stakeholders who want a concise narrative overview.
-- **When to use it:** As a readability aid only; deterministic artifacts remain the source of truth. If OpenAI or `OPENAI_API_KEY` is unavailable, a deterministic fallback summary is written instead.
+- **When to use it:** As a readability aid only; deterministic artifacts remain the source of truth. It is non-authoritative and does not change validation evidence, recommendations, or exit codes. If OpenAI or `OPENAI_API_KEY` is unavailable, a deterministic fallback summary is written instead.
