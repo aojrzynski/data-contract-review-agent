@@ -1,4 +1,7 @@
-"""Build structured suggested contract updates from validation findings."""
+"""Build advisory contract update suggestions from deterministic findings.
+
+These suggestions are review prompts only; this module never mutates contracts.
+"""
 
 from __future__ import annotations
 

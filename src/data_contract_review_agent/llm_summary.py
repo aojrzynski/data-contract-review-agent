@@ -1,4 +1,8 @@
-"""Build bounded LLM-polished summaries from deterministic evidence."""
+"""Build bounded LLM-polished summaries from deterministic evidence.
+
+The payload is intentionally compact and excludes raw rows/row-level samples.
+This keeps the LLM layer non-authoritative and scoped to wording polish.
+"""
 
 from __future__ import annotations
 

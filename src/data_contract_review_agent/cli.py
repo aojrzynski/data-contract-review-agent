@@ -1,4 +1,10 @@
-"""CLI entrypoint for the Data Contract Review Agent."""
+"""CLI entrypoint for the Data Contract Review Agent.
+
+The CLI coordinates the full local pipeline (intake, profiling, deterministic
+validation, optional review orchestration, and artifact writing). Exit-code
+policy is intentionally handled separately from report generation so teams can
+choose strict or non-blocking workflows without changing evidence output.
+"""
 
 from __future__ import annotations
 

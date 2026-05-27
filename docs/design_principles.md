@@ -2,28 +2,28 @@
 
 ## Deterministic validation comes before AI interpretation
 
-Contract conformance is a pass/fail question that should be reproducible. Deterministic validators provide the trust anchor.
+Contract conformance is pass/fail evidence. Deterministic checks provide reproducible outcomes teams can trust in CI, governance, and audits.
 
 ## Local-first matters
 
-Local execution keeps data handling simple, fast to iterate, and easier to reason about during development and demos.
+Local execution keeps the workflow practical for development, demos, and sensitive data handling. It also reduces setup complexity.
 
 ## Outputs must be traceable
 
-Each run writes artifacts for both people and automation so evidence can be inspected, shared, and re-checked.
+Each run writes human-readable and machine-readable artifacts so findings can be inspected, shared, and re-checked.
 
 ## Suggested updates are not auto-applied
 
-Contract changes affect governance and downstream systems. Suggestions are prompts only and require explicit human approval.
+Suggested updates are advisory prompts for review discussions. Contract governance still requires explicit human decisions.
 
 ## Bounded review mode
 
-Review mode is intentionally constrained: it organizes and explains deterministic findings, but does not invent or replace validation evidence.
+Review mode organizes deterministic findings into grouped recommendations. It improves usability without introducing open-ended autonomous behavior.
 
 ## LLM polish boundary
 
-LLM output is optional wording polish built from safe summary counts and recommendations only. Raw dataset rows and row-level evidence are never sent to the LLM. Deterministic artifacts (validation results, classifications, suggestions, traces, and exit codes) remain authoritative and unchanged by LLM output.
+The LLM layer is optional wording polish only. It receives bounded summary inputs and no raw dataset rows. Deterministic artifacts remain authoritative.
 
-## Where LLM support could fit later
+## Why no agent framework is needed for this v1
 
-An optional LLM layer can improve narrative clarity (for example, polished summaries), as long as deterministic outputs remain authoritative and unchanged.
+This project needs transparent orchestration, not complex autonomous planning. Focused local modules keep behavior easier to understand and maintain.

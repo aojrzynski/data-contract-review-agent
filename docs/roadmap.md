@@ -22,6 +22,6 @@
 - Contract diff/apply workflow with explicit human approval.
 - Additional contract rule types.
 - Packaged CLI release workflow.
-- Cross-agent portfolio consistency improvements.
+- Documentation and sample expansion for additional domains.
 
 No timeline commitments are implied; this list is an evolution direction.

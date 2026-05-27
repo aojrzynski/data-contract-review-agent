@@ -27,3 +27,6 @@ Deterministic evidence is reproducible and auditable. Review orchestration adds 
 ## What I would improve next
 
 I would add optional LLM-polished summaries, richer domain samples, and explicit contract diff/apply workflows with human approval gates.
+
+
+In the included failing demo, validation reports 8 findings (5 errors, 3 warnings), including one uniqueness violation.

@@ -1,4 +1,8 @@
-"""Classification of validation findings for practical contract review workflows."""
+"""Classification of validation findings for practical contract review workflows.
+
+Classification is triage metadata for humans. It does not add evidence and does
+not alter deterministic validator outcomes.
+"""
 
 from __future__ import annotations
 

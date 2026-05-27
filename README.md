@@ -1,95 +1,104 @@
 # data-contract-review-agent
 
-A local-first CLI agent for reviewing tabular datasets against data contracts. It uses deterministic checks for pass/fail evidence, then adds bounded review-mode orchestration for human-readable recommendations.
+A local-first CLI project for deterministic data contract validation and bounded review-mode orchestration.
 
 ## Why this exists
 
-Data contracts are useful only when teams can check them consistently against real datasets.
+Data contracts are only useful when they can be checked consistently against real datasets. This project demonstrates a practical pattern:
+- deterministic validation for pass/fail evidence,
+- bounded orchestration for review readability,
+- optional LLM polish that never becomes the authority layer.
 
-Many AI agent demos overuse LLMs for work that should stay deterministic. This project demonstrates a safer pattern: deterministic validation is the source of truth, while interpretation/orchestration stays around that evidence.
+## Why not just ask an LLM?
 
-Optional LLM-polished summaries are supported as a wording layer, never an authority layer.
+Contract conformance is a reproducibility problem, not just a summarization problem. If pass/fail outcomes are not deterministic, teams cannot rely on them for governance, CI, or audits.
 
-## What it does
+## What this project demonstrates
 
-- Loads CSV/XLSX/XLSM data.
-- Loads YAML/YML/JSON contracts.
-- Profiles observed dataset evidence.
-- Validates dataset evidence against a contract.
-- Classifies findings for triage.
-- Suggests possible contract review actions.
-- Writes markdown/JSON/CSV/YAML traceable artifacts.
-- Supports both `validate` mode and deterministic `review` mode.
+- Deterministic dataset-vs-contract checks across schema, quality, and operational rules.
+- Traceable artifacts for both humans and automation.
+- Review mode that groups deterministic findings into actionable recommendations.
+- Optional LLM-written `llm_summary.md` generated from bounded deterministic summary inputs.
+
+## Why this is an agent
+
+- `validate` mode runs a deterministic evidence pipeline.
+- `review` mode coordinates findings, classifications, suggestions, and recommendations into a structured review outcome.
+- The agent does **not** decide truth independently from deterministic validators.
+- This is bounded orchestration, not open-ended autonomy.
 
 ## Quick start
 
-Install editable with dev dependencies:
-
 ```bash
 python -m pip install -e ".[dev,llm]"
+python -m pytest
 ```
 
-Run tests:
+## Example commands
+
+```bash
+python -m data_contract_review_agent.cli --input sample_data/customers/customers_valid.csv --contract config/examples/customer_contract.yaml --mode validate --output-dir outputs/customers_valid
+python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode validate --output-dir outputs/customers_failures --fail-on never
+python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode review --output-dir outputs/customers_review --fail-on never
+python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode review --output-dir outputs/customers_review_llm --fail-on never --llm-summary
+```
+
+## Output artifacts
+
+- `contract_validation_report.md`
+- `contract_validation_results.json`
+- `contract_failures.csv`
+- `contract_trace.json`
+- `suggested_contract_updates.yaml`
+- `agent_review_report.md`
+- `agent_trace.json`
+- `llm_summary.md` (optional, non-authoritative)
+
+## Authority boundary
+
+- Deterministic validation findings are authoritative.
+- Review recommendations are derived from deterministic outputs.
+- Suggested contract updates are review prompts, not automatic edits.
+- `llm_summary.md` is optional wording polish only.
+- No raw dataset rows are sent to the LLM summary input.
+
+## Project structure
+
+- `cli.py`
+- `intake.py`
+- `contract_loader.py`
+- `profiling.py`
+- `validators.py`
+- `contract_validation.py`
+- `finding_classifier.py`
+- `suggested_updates.py`
+- `output_writers.py`
+- `reporting.py`
+- `trace_writer.py`
+- `review_mode.py`
+- `review_reporting.py`
+- `llm_summary.py`
+- `llm_client.py`
+
+## Run tests
 
 ```bash
 python -m pytest
 ```
 
-Passing validate command:
+## Limitations and non-goals
 
-```bash
-python -m data_contract_review_agent.cli --input sample_data/customers/customers_valid.csv --contract config/examples/customer_contract.yaml --mode validate --output-dir outputs/customers_valid
-```
+- No automatic contract mutation.
+- No row-level export to LLM prompts.
+- No attempt to replace deterministic validators with model inference.
+- Intentionally scoped as a practical educational v1.
 
-Failing validate command:
-
-```bash
-python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode validate --output-dir outputs/customers_failures --fail-on never
-```
-
-Review mode command:
-
-```bash
-python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode review --output-dir outputs/customers_review --fail-on never
-```
-
-## Output artifacts
-
-- `contract_validation_report.md`: Human-readable validation summary for quick review.
-- `contract_validation_results.json`: Full machine-readable validation payload.
-- `contract_failures.csv`: Finding-level (not row-level) failure table for triage.
-- `contract_trace.json`: Deterministic execution trace for validate-mode runs.
-- `suggested_contract_updates.yaml`: Non-mutating contract change suggestions requiring review.
-- `agent_review_report.md`: Human-readable grouped review recommendations.
-- `agent_trace.json`: Deterministic review-mode trace showing bounded orchestration.
-
-## Design principles
-
-- Deterministic checks are authoritative.
-- Review mode is orchestration only.
-- Suggested contract updates are not applied automatically.
-- LLM summary is optional (`--llm-summary`) and non-authoritative.
-- Local-first and easy to run.
-
-## Project status
-
-This is a portfolio/demo project (Agent 4 in a staged suite) built to be practical, readable, and extensible rather than a toy. It is production-minded in structure, while still intentionally scoped as a v1.
-
-## More docs
+## Further reading
 
 - [Architecture](docs/architecture.md)
+- [Design principles](docs/design_principles.md)
 - [Artifacts](docs/artifacts.md)
 - [Demo walkthrough](docs/demo_walkthrough.md)
-- [Design principles](docs/design_principles.md)
-- [Roadmap](docs/roadmap.md)
-- [Portfolio summary](docs/portfolio_summary.md)
 - [Example commands](docs/example_commands.md)
-
-
-Optional LLM summary command:
-
-```bash
-python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode review --output-dir outputs/customers_review_llm --fail-on never --llm-summary
-```
-
-Without `OPENAI_API_KEY`, the CLI writes a deterministic fallback `llm_summary.md` and continues normally.
+- [Portfolio summary](docs/portfolio_summary.md)
+- [Roadmap](docs/roadmap.md)

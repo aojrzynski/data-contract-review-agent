@@ -1,4 +1,9 @@
-"""Deterministic bounded review-mode orchestration."""
+"""Deterministic, bounded review-mode orchestration.
+
+Review mode coordinates deterministic findings into grouped recommendations and
+trace steps. It is intentionally authority-bounded: validators decide truth,
+while review mode organizes how humans consume that truth.
+"""
 
 from __future__ import annotations
 
