@@ -2,7 +2,7 @@ contract:
   name: customer_master_contract
   version: 1.0.0
   owner: data_governance_team
-  description: Expected structure and quality rules for the customer master extract.
+  description: Stable baseline contract for customer master validation demos.
 
 dataset:
   expected_name: customer_master
@@ -17,7 +17,6 @@ dataset:
     allowed_values_violation: error
     range_violation: error
     pattern_violation: warning
-    freshness_violation: warning
 
 schema:
   allow_unexpected_columns: false
@@ -38,21 +37,24 @@ columns:
     required: true
     type: string
     nullable: false
+    pattern: "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
   signup_date:
     required: true
     type: date
     nullable: false
-  active:
+  status:
     required: true
-    type: boolean
+    type: string
     nullable: false
-  updated_at:
+    allowed_values:
+      - active
+      - inactive
+      - trial
+  lifetime_value:
     required: true
-    type: datetime
+    type: number
     nullable: false
-    freshness:
-      max_age_days: 30
-      reference: max_value
+    min: 0
 
 row_count:
   min: 1

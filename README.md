@@ -18,7 +18,10 @@ Install editable with dev dependencies:
 Run tests:
 `python -m pytest`
 
-Run validate mode:
+Run passing validate example:
 `python -m data_contract_review_agent.cli --input sample_data/customers/customers_valid.csv --contract config/examples/customer_contract.yaml --mode validate --output-dir outputs/customers_valid`
 
-Validation artifacts are written to the selected output directory.
+Run failing validate example without blocking CI/local scripts:
+`python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode validate --output-dir outputs/customers_failures --fail-on never`
+
+More copy/paste examples are in `docs/example_commands.md`.
