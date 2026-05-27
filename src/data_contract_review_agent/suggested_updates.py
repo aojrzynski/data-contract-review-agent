@@ -115,7 +115,7 @@ def _build_update_from_finding(finding: ValidationFinding, profile: DatasetProfi
             suggestion_type="review_row_count_bounds",
             target_path="row_count",
             column=None,
-            proposed_change=make_json_safe({"observed_row_count": finding.evidence.get("observed_row_count")}),  # type: ignore[arg-type]
+            proposed_change=make_json_safe({"observed_row_count": finding.evidence.get("row_count", finding.evidence.get("observed_row_count"))}),  # type: ignore[arg-type]
             confidence="low",
             reason="Observed row volume is outside declared bounds; review extraction behavior or row_count expectations.",
             evidence=make_json_safe(finding.evidence),  # type: ignore[arg-type]

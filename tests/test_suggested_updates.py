@@ -63,7 +63,7 @@ def test_suggested_updates_for_supported_finding_types_and_contract_immutability
             ValidationFinding("n", "nullability_violation", "id", evidence={"null_count": 1}),
             ValidationFinding("t", "type_mismatch", "id", evidence={"observed_type": "string"}),
             ValidationFinding("f", "freshness_violation", "event_date", evidence={"age_days": 30}),
-            ValidationFinding("r", "row_count_violation", None, evidence={"observed_row_count": 3}),
+            ValidationFinding("r", "row_count_violation", None, evidence={"row_count": 3, "min_allowed": 4, "max_allowed": 10}),
             ValidationFinding("x", "pattern_violation", "id", evidence={}),
         ],
     )
@@ -91,6 +91,7 @@ def test_suggested_updates_for_supported_finding_types_and_contract_immutability
 
     row_count = by_type["review_row_count_bounds"]
     assert row_count.target_path == "row_count"
+    assert row_count.proposed_change["observed_row_count"] == 3
 
     assert "pattern_violation" not in [item.suggestion_type for item in suggestions.suggestions]
     assert contract == contract_snapshot
