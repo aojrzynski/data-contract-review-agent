@@ -86,3 +86,9 @@ def test_review_mode_llm_summary_writes_artifact(tmp_path: Path, capsys, monkeyp
     out = capsys.readouterr().out
     assert 'llm_summary:' in out
     assert 'llm_used:' in out
+
+    report_text = (output_dir / 'agent_review_report.md').read_text(encoding='utf-8')
+    assert '- llm_summary:' in report_text
+
+    trace_payload = json.loads((output_dir / 'agent_trace.json').read_text(encoding='utf-8'))
+    assert trace_payload['artifacts']['llm_summary'].endswith('llm_summary.md')

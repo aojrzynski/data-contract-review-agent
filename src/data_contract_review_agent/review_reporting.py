@@ -43,8 +43,9 @@ def build_agent_review_report(review_result: ReviewModeResult) -> str:
         [
             "",
             "## Authority boundary",
-            "Review mode is a deterministic orchestration layer. It does not replace the validation evidence. "
-            "Suggested contract updates are not applied automatically. No LLM was used in this run.",
+            "This review report was generated deterministically. It does not use an LLM to create validation evidence "
+            "or recommendations. If llm_summary.md is present, that file is optional wording polish and is not part "
+            "of the validation evidence.",
         ]
     )
 

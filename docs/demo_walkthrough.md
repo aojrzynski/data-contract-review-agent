@@ -58,7 +58,7 @@ cat outputs/customers_review/agent_review_report.md
 
 - Deterministic contract validation is the authority layer.
 - Failing evidence is exported in traceable artifacts.
-- Review mode adds bounded orchestration and readable grouping, without using any LLM.
+- Review mode adds bounded orchestration and readable grouping deterministically (validation evidence + recommendations remain non-LLM).
 
 
 ## Optional LLM-polished summary
@@ -67,4 +67,4 @@ cat outputs/customers_review/agent_review_report.md
 python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode review --output-dir outputs/customers_review_llm --fail-on never --llm-summary
 ```
 
-If `OPENAI_API_KEY` is missing, the command still succeeds and writes a deterministic fallback `llm_summary.md`.
+If `OPENAI_API_KEY` is missing, the command still succeeds and writes a deterministic fallback `llm_summary.md`. That summary is optional wording polish only and is not part of authoritative validation evidence.

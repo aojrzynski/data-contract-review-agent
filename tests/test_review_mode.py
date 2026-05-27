@@ -50,6 +50,10 @@ def test_review_mode_recommendations_and_authority_boundary() -> None:
 
     assert review.contract_name == 'customer_contract'
     assert review.authority_boundary['llm_used'] is False
+    assert review.authority_boundary['llm_used_for_validation'] is False
+    assert review.authority_boundary['llm_used_for_review_recommendations'] is False
+    assert review.authority_boundary['llm_summary_requested'] is False
+    assert review.authority_boundary['llm_summary_artifact'] is None
     categories = {r.category for r in review.recommendations}
     assert 'schema_drift' in categories
     assert 'contract_review' in categories
@@ -74,6 +78,7 @@ def test_review_report_and_trace_are_stable_json_safe() -> None:
     assert '## Recommended next actions' in report
     assert '## Review steps' in report
     assert '## Authority boundary' in report
+    assert 'does not use an LLM to create validation evidence or recommendations' in report
 
     payload = review_mode_to_json_safe_dict(review)
     dumped = json.dumps(payload, indent=2, sort_keys=True)

@@ -69,6 +69,10 @@ def run_review_mode(
         "review_mode_is_orchestration_only": True,
         "suggestions_are_applied_automatically": False,
         "llm_used": False,
+        "llm_used_for_validation": False,
+        "llm_used_for_review_recommendations": False,
+        "llm_summary_requested": "llm_summary" in validation_artifacts,
+        "llm_summary_artifact": str(validation_artifacts["llm_summary"]) if "llm_summary" in validation_artifacts else None,
     }
 
     return ReviewModeResult(
