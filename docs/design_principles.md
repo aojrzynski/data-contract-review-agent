@@ -20,6 +20,10 @@ Contract changes affect governance and downstream systems. Suggestions are promp
 
 Review mode is intentionally constrained: it organizes and explains deterministic findings, but does not invent or replace validation evidence.
 
+## LLM polish boundary
+
+LLM output is optional wording polish built from safe summary counts and recommendations only. Raw dataset rows and row-level evidence are never sent to the LLM. Deterministic artifacts (validation results, classifications, suggestions, traces, and exit codes) remain authoritative and unchanged by LLM output.
+
 ## Where LLM support could fit later
 
 An optional LLM layer can improve narrative clarity (for example, polished summaries), as long as deterministic outputs remain authoritative and unchanged.

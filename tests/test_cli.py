@@ -143,7 +143,7 @@ def test_validate_mode_requires_input_and_contract(tmp_path: Path) -> None:
     assert missing_contract.value.code == 2
 
 
-def test_llm_summary_not_implemented(tmp_path: Path, capsys) -> None:
+def test_validate_mode_llm_summary_writes_artifact_with_fallback(tmp_path: Path, capsys) -> None:
     csv_path = tmp_path / "customers_valid.csv"
     contract_path = tmp_path / "contract.yaml"
 
@@ -152,5 +152,7 @@ def test_llm_summary_not_implemented(tmp_path: Path, capsys) -> None:
 
     code = run_cli(["--input", str(csv_path), "--contract", str(contract_path), "--llm-summary"])
 
-    assert code == 2
-    assert "not implemented" in capsys.readouterr().out
+    assert code == 0
+    out = capsys.readouterr().out
+    assert "llm_summary:" in out
+    assert "llm_used: false" in out

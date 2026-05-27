@@ -14,6 +14,7 @@ from data_contract_review_agent.contract_validation import validate_contract
 from data_contract_review_agent.finding_classifier import ClassifiedValidationResult, classify_validation_result
 from data_contract_review_agent.intake import DatasetMetadata, load_dataset
 from data_contract_review_agent.output_writers import write_validation_outputs
+from data_contract_review_agent.llm_summary import build_llm_summary_input, build_llm_summary_markdown
 from data_contract_review_agent.profiling import DatasetProfile, build_dataset_profile
 from data_contract_review_agent.review_mode import ReviewModeResult, review_mode_to_json_safe_dict, run_review_mode
 from data_contract_review_agent.review_reporting import build_agent_review_report
@@ -114,10 +115,6 @@ def run_cli(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
-    if args.llm_summary:
-        print("LLM summaries are not implemented yet")
-        return 2
-
     if not args.input:
         parser.error(f"--input is required when --mode {args.mode}")
     if not args.contract:
@@ -150,6 +147,7 @@ def run_cli(argv: list[str] | None = None) -> int:
     print(f"overall_status: {determine_overall_status(pipeline.classified_result)}")
 
     artifacts = dict(pipeline.artifacts)
+    review_result = None
     if args.mode == "review":
         artifacts.update(_expected_review_artifacts(args.output_dir))
         review_result = run_review_mode(
@@ -162,6 +160,22 @@ def run_cli(argv: list[str] | None = None) -> int:
         )
         _write_review_artifacts(review_result)
         print(f"recommendations_total: {len(review_result.recommendations)}")
+
+    if args.llm_summary:
+        llm_payload = build_llm_summary_input(
+            validation_result=pipeline.validation_result,
+            classified_result=pipeline.classified_result,
+            suggested_updates=pipeline.suggested_updates,
+            review_result=review_result,
+        )
+        llm_result = build_llm_summary_markdown(summary_payload=llm_payload, model=args.llm_model)
+        llm_summary_path = output_dir / "llm_summary.md"
+        llm_summary_path.write_text(llm_result.summary_markdown, encoding="utf-8")
+        artifacts["llm_summary"] = llm_summary_path
+        print(f"llm_summary: {llm_summary_path}")
+        print(f"llm_used: {str(llm_result.used_llm).lower()}")
+        if llm_result.fallback_reason:
+            print(f"llm_fallback_reason: {llm_result.fallback_reason}")
 
     print(f"output_dir: {output_dir}")
     print("artifacts:")
