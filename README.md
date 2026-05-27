@@ -10,6 +10,7 @@ This repo supports deterministic:
 - finding classification
 - suggested contract updates (non-mutating)
 - output artifact writing
+- CLI validate mode and bounded deterministic review mode
 
 ## Quick start
 Install editable with dev dependencies:
@@ -23,5 +24,8 @@ Run passing validate example:
 
 Run failing validate example without blocking CI/local scripts:
 `python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode validate --output-dir outputs/customers_failures --fail-on never`
+
+Run deterministic review mode example:
+`python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode review --output-dir outputs/customers_review --fail-on never`
 
 More copy/paste examples are in `docs/example_commands.md`.
