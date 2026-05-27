@@ -9,3 +9,9 @@ This early scaffold currently supports:
 - deterministic dataset profiling / observed evidence extraction
 
 Deterministic dataset-vs-contract validation checks are the next phase.
+
+## Testing
+Tests run locally with:
+`python -m pytest`
+
+Pull requests are checked with GitHub Actions.
