@@ -1,31 +1,86 @@
 # data-contract-review-agent
-Local-first data contract review agent for validating datasets against declared expectations.
 
-## Current development status
-This repo supports deterministic:
-- loading tabular datasets from CSV/XLSX/XLSM
-- loading contract files from YAML/JSON
-- dataset profiling / observed evidence extraction
-- dataset-vs-contract validation
-- finding classification
-- suggested contract updates (non-mutating)
-- output artifact writing
-- CLI validate mode and bounded deterministic review mode
+A local-first CLI agent for reviewing tabular datasets against data contracts. It uses deterministic checks for pass/fail evidence, then adds bounded review-mode orchestration for human-readable recommendations.
+
+## Why this exists
+
+Data contracts are useful only when teams can check them consistently against real datasets.
+
+Many AI agent demos overuse LLMs for work that should stay deterministic. This project demonstrates a safer pattern: deterministic validation is the source of truth, while interpretation/orchestration stays around that evidence.
+
+LLM support may be added later as a polish layer, not as an authority layer.
+
+## What it does
+
+- Loads CSV/XLSX/XLSM data.
+- Loads YAML/YML/JSON contracts.
+- Profiles observed dataset evidence.
+- Validates dataset evidence against a contract.
+- Classifies findings for triage.
+- Suggests possible contract review actions.
+- Writes markdown/JSON/CSV/YAML traceable artifacts.
+- Supports both `validate` mode and deterministic `review` mode.
 
 ## Quick start
+
 Install editable with dev dependencies:
-`python -m pip install -e ".[dev]"`
+
+```bash
+python -m pip install -e ".[dev]"
+```
 
 Run tests:
-`python -m pytest`
 
-Run passing validate example:
-`python -m data_contract_review_agent.cli --input sample_data/customers/customers_valid.csv --contract config/examples/customer_contract.yaml --mode validate --output-dir outputs/customers_valid`
+```bash
+python -m pytest
+```
 
-Run failing validate example without blocking CI/local scripts:
-`python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode validate --output-dir outputs/customers_failures --fail-on never`
+Passing validate command:
 
-Run deterministic review mode example:
-`python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode review --output-dir outputs/customers_review --fail-on never`
+```bash
+python -m data_contract_review_agent.cli --input sample_data/customers/customers_valid.csv --contract config/examples/customer_contract.yaml --mode validate --output-dir outputs/customers_valid
+```
 
-More copy/paste examples are in `docs/example_commands.md`.
+Failing validate command:
+
+```bash
+python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode validate --output-dir outputs/customers_failures --fail-on never
+```
+
+Review mode command:
+
+```bash
+python -m data_contract_review_agent.cli --input sample_data/customers/customers_contract_failures.csv --contract config/examples/customer_contract.yaml --mode review --output-dir outputs/customers_review --fail-on never
+```
+
+## Output artifacts
+
+- `contract_validation_report.md`: Human-readable validation summary for quick review.
+- `contract_validation_results.json`: Full machine-readable validation payload.
+- `contract_failures.csv`: Finding-level (not row-level) failure table for triage.
+- `contract_trace.json`: Deterministic execution trace for validate-mode runs.
+- `suggested_contract_updates.yaml`: Non-mutating contract change suggestions requiring review.
+- `agent_review_report.md`: Human-readable grouped review recommendations.
+- `agent_trace.json`: Deterministic review-mode trace showing bounded orchestration.
+
+## Design principles
+
+- Deterministic checks are authoritative.
+- Review mode is orchestration only.
+- Suggested contract updates are not applied automatically.
+- No LLM is used in the current version.
+- Local-first and easy to run.
+
+## Project status
+
+This is a portfolio/demo project (Agent 4 in a staged suite) built to be practical, readable, and extensible rather than a toy. It is production-minded in structure, while still intentionally scoped as a v1.
+
+## More docs
+
+- [Architecture](docs/architecture.md)
+- [Artifacts](docs/artifacts.md)
+- [Demo walkthrough](docs/demo_walkthrough.md)
+- [Design principles](docs/design_principles.md)
+- [Roadmap](docs/roadmap.md)
+- [Portfolio summary](docs/portfolio_summary.md)
+- [Example commands](docs/example_commands.md)

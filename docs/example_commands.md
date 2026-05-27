@@ -1,6 +1,7 @@
-# Example validate commands
+# Example commands
 
-## Passing validation (quick start)
+## Validate mode: passing input
+
 ```bash
 python -m data_contract_review_agent.cli \
   --input sample_data/customers/customers_valid.csv \
@@ -9,7 +10,8 @@ python -m data_contract_review_agent.cli \
   --output-dir outputs/customers_valid
 ```
 
-## Failing validation, non-blocking (`--fail-on never`)
+## Validate mode: failing input (non-blocking)
+
 ```bash
 python -m data_contract_review_agent.cli \
   --input sample_data/customers/customers_contract_failures.csv \
@@ -19,7 +21,8 @@ python -m data_contract_review_agent.cli \
   --fail-on never
 ```
 
-## Failing validation, blocking (default `--fail-on error`)
+## Validate mode: failing input (blocking default)
+
 ```bash
 python -m data_contract_review_agent.cli \
   --input sample_data/customers/customers_contract_failures.csv \
@@ -28,7 +31,8 @@ python -m data_contract_review_agent.cli \
   --output-dir outputs/customers_failures_blocking
 ```
 
-## Deterministic review mode
+## Review mode: deterministic orchestration
+
 ```bash
 python -m data_contract_review_agent.cli \
   --input sample_data/customers/customers_contract_failures.csv \
@@ -38,11 +42,12 @@ python -m data_contract_review_agent.cli \
   --fail-on never
 ```
 
-## Artifacts written to the output directory
-- `contract_validation_report.md`: Human-readable markdown summary for quick review.
-- `contract_validation_results.json`: Full machine-readable validation results.
-- `contract_failures.csv`: Finding-level validation table for triage.
-- `contract_trace.json`: Deterministic run trace and execution metadata.
-- `suggested_contract_updates.yaml`: Non-mutating contract update suggestions.
-- `agent_review_report.md`: Deterministic review-mode recommendations and step summary.
-- `agent_trace.json`: Deterministic review orchestration trace with authority boundary.
+## Artifacts written in output directories
+
+- `contract_validation_report.md`: Human-readable validation summary.
+- `contract_validation_results.json`: Machine-readable validation output.
+- `contract_failures.csv`: Finding-level failures table (not row-level data export).
+- `contract_trace.json`: Deterministic validate-mode run trace.
+- `suggested_contract_updates.yaml`: Non-mutating suggestions requiring human review.
+- `agent_review_report.md`: Human-readable deterministic review report.
+- `agent_trace.json`: Deterministic review trace, including authority-boundary evidence.
