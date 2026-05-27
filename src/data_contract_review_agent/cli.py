@@ -94,10 +94,17 @@ def run_validation_pipeline(args: argparse.Namespace) -> PipelineResult:
     return PipelineResult(metadata, contract, profile, validation_result, classified_result, suggested_updates, artifacts)
 
 
-def _write_review_artifacts(output_dir: str | Path, review_result: ReviewModeResult) -> dict[str, Path]:
+def _expected_review_artifacts(output_dir: str | Path) -> dict[str, Path]:
     output_path = Path(output_dir)
-    report_path = output_path / "agent_review_report.md"
-    trace_path = output_path / "agent_trace.json"
+    return {
+        "agent_review_report": output_path / "agent_review_report.md",
+        "agent_trace_json": output_path / "agent_trace.json",
+    }
+
+
+def _write_review_artifacts(review_result: ReviewModeResult) -> dict[str, Path]:
+    report_path = Path(review_result.artifacts["agent_review_report"])
+    trace_path = Path(review_result.artifacts["agent_trace_json"])
     report_path.write_text(build_agent_review_report(review_result), encoding="utf-8")
     trace_path.write_text(json.dumps(make_json_safe(review_mode_to_json_safe_dict(review_result)), indent=2, sort_keys=True), encoding="utf-8")
     return {"agent_review_report": report_path, "agent_trace_json": trace_path}
@@ -144,15 +151,16 @@ def run_cli(argv: list[str] | None = None) -> int:
 
     artifacts = dict(pipeline.artifacts)
     if args.mode == "review":
+        artifacts.update(_expected_review_artifacts(args.output_dir))
         review_result = run_review_mode(
             validation_result=pipeline.validation_result,
             classified_result=pipeline.classified_result,
             suggested_updates=pipeline.suggested_updates,
             profile=pipeline.profile,
             contract=pipeline.contract,
-            validation_artifacts=pipeline.artifacts,
+            validation_artifacts=artifacts,
         )
-        artifacts.update(_write_review_artifacts(args.output_dir, review_result))
+        _write_review_artifacts(review_result)
         print(f"recommendations_total: {len(review_result.recommendations)}")
 
     print(f"output_dir: {output_dir}")
