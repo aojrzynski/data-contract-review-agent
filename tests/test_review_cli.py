@@ -70,8 +70,9 @@ def test_review_artifact_map_includes_agent_artifacts(tmp_path: Path) -> None:
     assert 'agent_trace_json' in trace_payload['artifacts']
 
 
-def test_review_mode_llm_summary_writes_artifact(tmp_path: Path, capsys) -> None:
+def test_review_mode_llm_summary_writes_artifact(tmp_path: Path, capsys, monkeypatch) -> None:
     output_dir = tmp_path / 'review_outputs'
+    monkeypatch.delenv('OPENAI_API_KEY', raising=False)
     code = run_cli([
         '--mode', 'review',
         '--input', str(ROOT / 'sample_data/customers/customers_contract_failures.csv'),

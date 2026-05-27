@@ -64,7 +64,9 @@ def test_build_llm_summary_input_excludes_raw_samples_and_is_json_safe() -> None
     assert "counts_by_severity" in payload
 
 
-def test_build_llm_summary_markdown_fallback_without_client() -> None:
+def test_build_llm_summary_markdown_fallback_without_client(monkeypatch) -> None:
+    # Tests must not require OPENAI_API_KEY or make real API calls.
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     result = build_llm_summary_markdown({"dataset_name": "d", "contract_name": "c", "row_count": 1, "column_count": 1, "total_findings": 0, "counts_by_severity": {}, "counts_by_rule_type": {}, "counts_by_compatibility": {}, "counts_by_priority": {}, "artifact_names": []}, client=None)
     assert result.used_llm is False
     assert "Non-authoritative note" in result.summary_markdown

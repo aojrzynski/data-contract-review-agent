@@ -143,13 +143,15 @@ def test_validate_mode_requires_input_and_contract(tmp_path: Path) -> None:
     assert missing_contract.value.code == 2
 
 
-def test_validate_mode_llm_summary_writes_artifact_with_fallback(tmp_path: Path, capsys) -> None:
+def test_validate_mode_llm_summary_writes_artifact_with_fallback(tmp_path: Path, capsys, monkeypatch) -> None:
     csv_path = tmp_path / "customers_valid.csv"
     contract_path = tmp_path / "contract.yaml"
 
     _write_csv(csv_path, ["customer_id,email", "1,a@example.com"])
     _write_contract(contract_path)
 
+    # Ensure fallback path is deterministic and does not depend on local env credentials.
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     code = run_cli(["--input", str(csv_path), "--contract", str(contract_path), "--llm-summary"])
 
     assert code == 0
