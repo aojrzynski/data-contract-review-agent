@@ -30,9 +30,17 @@ Contract conformance is a reproducibility problem, not just a summarization prob
 ## Quick start
 
 ```bash
-python -m pip install -e ".[dev,llm]"
+python -m pip install -e ".[dev]"
 python -m pytest
 ```
+
+Optional LLM setup:
+
+```bash
+python -m pip install -e ".[dev,llm]"
+```
+
+`OPENAI_API_KEY` is only required for a real OpenAI summary call. If it is missing and you run with `--llm-summary`, the tool writes a deterministic fallback `llm_summary.md`.
 
 ## Example commands
 
@@ -64,21 +72,21 @@ python -m data_contract_review_agent.cli --input sample_data/customers/customers
 
 ## Project structure
 
-- `cli.py`
-- `intake.py`
-- `contract_loader.py`
-- `profiling.py`
-- `validators.py`
-- `contract_validation.py`
-- `finding_classifier.py`
-- `suggested_updates.py`
-- `output_writers.py`
-- `reporting.py`
-- `trace_writer.py`
-- `review_mode.py`
-- `review_reporting.py`
-- `llm_summary.py`
-- `llm_client.py`
+- `src/data_contract_review_agent/cli.py` — command-line entrypoint and pipeline orchestration.
+- `src/data_contract_review_agent/intake.py` — dataset loading and intake metadata.
+- `src/data_contract_review_agent/contract_loader.py` — contract file loading and parsing.
+- `src/data_contract_review_agent/profiling.py` — deterministic dataset profiling evidence.
+- `src/data_contract_review_agent/validators.py` — deterministic evidence-producing checks.
+- `src/data_contract_review_agent/contract_validation.py` — orchestration of all deterministic validators.
+- `src/data_contract_review_agent/finding_classifier.py` — triage metadata classification for findings.
+- `src/data_contract_review_agent/suggested_updates.py` — advisory contract update suggestions.
+- `src/data_contract_review_agent/output_writers.py` — validation artifact persistence.
+- `src/data_contract_review_agent/reporting.py` — markdown report rendering for validation results.
+- `src/data_contract_review_agent/trace_writer.py` — deterministic validate-mode trace artifact writing.
+- `src/data_contract_review_agent/review_mode.py` — bounded review-mode recommendation orchestration.
+- `src/data_contract_review_agent/review_reporting.py` — review-mode markdown report rendering.
+- `src/data_contract_review_agent/llm_summary.py` — bounded payload construction and optional summary generation.
+- `src/data_contract_review_agent/llm_client.py` — optional OpenAI client boundary wrappers.
 
 ## Run tests
 
