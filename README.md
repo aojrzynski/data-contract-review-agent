@@ -12,6 +12,8 @@ Deterministic dataset-vs-contract validation checks are now implemented.
 
 Finding classification and suggested contract update structures are now implemented.
 
+Validation output artifact writing and markdown reporting are now implemented.
+
 ## Testing
 Tests run locally with:
 `python -m pytest`
