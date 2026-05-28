@@ -19,6 +19,7 @@ from data_contract_review_agent.suggested_updates import SuggestedContractUpdate
 
 @dataclass(frozen=True)
 class ReviewStep:
+    """One bounded orchestration step captured for deterministic review tracing."""
     step_name: str
     status: str
     summary: str
@@ -27,6 +28,7 @@ class ReviewStep:
 
 @dataclass(frozen=True)
 class ReviewRecommendation:
+    """Deterministic recommendation derived from classified findings."""
     recommendation_id: str
     priority: str
     category: str
@@ -37,6 +39,7 @@ class ReviewRecommendation:
 
 @dataclass(frozen=True)
 class ReviewModeResult:
+    """Complete deterministic review-mode output with steps and recommendations."""
     contract_name: str
     dataset_name: str
     overall_status: str
@@ -94,6 +97,7 @@ def run_review_mode(
 
 
 def review_mode_to_json_safe_dict(review_result: ReviewModeResult) -> dict[str, object]:
+    """Convert review-mode output to a deterministic JSON-safe artifact payload."""
     return make_json_safe(asdict(review_result))
 
 
@@ -200,6 +204,7 @@ def _build_recommendations(
 
 
 def _collect_ids(by_rule_type: dict[str, list[str]], rule_types: set[str]) -> list[str]:
+    """Collect sorted finding IDs for rule groups referenced in recommendations."""
     collected: list[str] = []
     for rule_type in sorted(rule_types):
         collected.extend(by_rule_type.get(rule_type, []))
@@ -207,6 +212,7 @@ def _collect_ids(by_rule_type: dict[str, list[str]], rule_types: set[str]) -> li
 
 
 def _determine_overall_status(classified_result: ClassifiedValidationResult) -> str:
+    """Derive overall review status from deterministic classified findings."""
     has_failed_error = any(
         item.status == "failed" and item.severity == "error" for item in classified_result.classifications
     )

@@ -11,6 +11,7 @@ from data_contract_review_agent.suggested_updates import SuggestedContractUpdate
 
 
 def _markdown_table(title: str, counts: Counter[str]) -> list[str]:
+    """Render a sorted markdown count table for stable human-readable summaries."""
     lines = [f"## {title}", "| category | count |", "|---|---:|"]
     for key in sorted(counts):
         lines.append(f"| {key} | {counts[key]} |")

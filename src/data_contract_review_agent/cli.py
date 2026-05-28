@@ -30,6 +30,7 @@ from data_contract_review_agent.suggested_updates import SuggestedContractUpdate
 
 @dataclass(frozen=True)
 class PipelineResult:
+    """Container for deterministic pipeline artifacts used by CLI output writers."""
     metadata: DatasetMetadata
     contract: DataContract
     profile: DatasetProfile
@@ -40,6 +41,7 @@ class PipelineResult:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build the CLI parser for deterministic validation and optional review flows."""
     parser = argparse.ArgumentParser(
         prog="data-contract-review-agent",
         description="Validate a dataset against a declared data contract.",
@@ -57,6 +59,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def determine_overall_status(classified_result: ClassifiedValidationResult) -> str:
+    """Summarize run status from deterministic classified findings."""
     has_failed_error = any(
         item.status == "failed" and item.severity == "error" for item in classified_result.classifications
     )
@@ -68,6 +71,7 @@ def determine_overall_status(classified_result: ClassifiedValidationResult) -> s
 
 
 def _should_fail(fail_on: str, classified_result: ClassifiedValidationResult) -> bool:
+    """Apply CLI fail-on policy without changing deterministic finding evidence."""
     if fail_on == "never":
         return False
     if fail_on == "error":
@@ -79,6 +83,7 @@ def _should_fail(fail_on: str, classified_result: ClassifiedValidationResult) ->
 
 
 def run_validation_pipeline(args: argparse.Namespace) -> PipelineResult:
+    """Execute deterministic intake, validation, classification, and artifact writing."""
     dataframe, metadata = load_dataset(args.input, sheet=args.sheet)
     contract = load_contract(args.contract)
     profile = build_dataset_profile(dataframe, metadata)
@@ -102,6 +107,7 @@ def run_validation_pipeline(args: argparse.Namespace) -> PipelineResult:
 
 
 def _expected_review_artifacts(output_dir: str | Path) -> dict[str, Path]:
+    """Return stable review-mode artifact names for predictable downstream access."""
     output_path = Path(output_dir)
     return {
         "agent_review_report": output_path / "agent_review_report.md",
@@ -110,6 +116,7 @@ def _expected_review_artifacts(output_dir: str | Path) -> dict[str, Path]:
 
 
 def _write_review_artifacts(review_result: ReviewModeResult) -> dict[str, Path]:
+    """Write deterministic review report and trace artifacts."""
     report_path = Path(review_result.artifacts["agent_review_report"])
     trace_path = Path(review_result.artifacts["agent_trace_json"])
     report_path.write_text(build_agent_review_report(review_result), encoding="utf-8")
@@ -118,6 +125,7 @@ def _write_review_artifacts(review_result: ReviewModeResult) -> dict[str, Path]:
 
 
 def run_cli(argv: list[str] | None = None) -> int:
+    """Execute the CLI end-to-end with deterministic artifacts and exit policy."""
     parser = build_parser()
     args = parser.parse_args(argv)
 
@@ -194,6 +202,7 @@ def run_cli(argv: list[str] | None = None) -> int:
 
 
 def main() -> int:
+    """Program entrypoint for console scripts and direct module execution."""
     return run_cli()
 
 

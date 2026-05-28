@@ -1,4 +1,8 @@
-"""Dataset intake functions for loading tabular files with basic guardrails."""
+"""Dataset intake helpers for local tabular files with safety guardrails.
+
+This layer normalizes supported file inputs into a DataFrame plus stable
+metadata used by downstream deterministic stages.
+"""
 
 from __future__ import annotations
 
@@ -13,7 +17,10 @@ SUPPORTED_DATASET_EXTENSIONS = {".csv", ".xlsx", ".xlsm"}
 
 
 def load_dataset(path: str | Path, sheet: str | None = None) -> tuple[pd.DataFrame, DatasetMetadata]:
-    """Load a supported dataset and return both rows and stable intake metadata."""
+    """Load a supported local tabular dataset and intake metadata.
+
+Fails fast for missing paths, unsupported formats, and empty inputs.
+"""
     source_path = Path(path)
     if not source_path.exists():
         raise FileNotFoundError(f"Dataset file not found: {source_path}")
@@ -25,10 +32,12 @@ def load_dataset(path: str | Path, sheet: str | None = None) -> tuple[pd.DataFra
         )
 
     selected_sheet: str | None = None
+    # CSV uses a direct single-table reader; Excel requires workbook handling.
     if extension == ".csv":
         dataframe = pd.read_csv(source_path)
     else:
         workbook = pd.ExcelFile(source_path)
+        # When no sheet is requested, default to the first workbook sheet deterministically.
         if sheet is not None:
             if sheet not in workbook.sheet_names:
                 raise ValueError(
@@ -41,6 +50,7 @@ def load_dataset(path: str | Path, sheet: str | None = None) -> tuple[pd.DataFra
 
         dataframe = pd.read_excel(source_path, sheet_name=selected_sheet)
 
+    # Empty datasets are rejected early so validators never operate on degenerate inputs.
     if dataframe.shape[0] == 0:
         raise ValueError(f"Dataset '{source_path}' is empty (zero rows).")
     if dataframe.shape[1] == 0:

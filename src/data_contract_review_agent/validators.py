@@ -32,6 +32,7 @@ def _severity(
     column: ColumnContract | None = None,
     rule_severity: str | None = None,
 ) -> str:
+    """Centralize severity precedence across column, rule, and dataset defaults."""
     # Severity precedence: column override > rule override > dataset defaults > global defaults.
     if column and column.severity:
         return column.severity
@@ -41,6 +42,7 @@ def _severity(
 
 
 def _finding_id(rule_type: str, columns: list[str]) -> str:
+    """Create stable finding IDs for joining report, JSON, and CSV artifacts."""
     # Finding IDs are deterministic so findings remain traceable across reruns.
     suffix = "_".join(columns) if columns else "dataset"
     return f"{rule_type}:{suffix}"
@@ -163,6 +165,7 @@ def _evaluate_uniqueness(
     name: str,
     max_examples: int,
 ) -> ValidationFinding | None:
+    """Shared uniqueness evaluator for single and composite keys; may fail, skip, or emit nothing."""
     missing = [col for col in columns if col not in dataframe.columns]
     if missing:
         return ValidationFinding(

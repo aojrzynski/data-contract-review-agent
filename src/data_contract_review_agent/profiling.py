@@ -18,12 +18,14 @@ from data_contract_review_agent.contract_models import DatasetMetadata
 
 @dataclass(slots=True)
 class TopValue:
+    """Deterministic top-frequency value summary used in column profiling."""
     value: str | int | float | bool
     count: int
 
 
 @dataclass(slots=True)
 class ColumnProfile:
+    """Observed profile snapshot for one dataset column."""
     name: str
     pandas_dtype: str
     observed_logical_type: str
@@ -43,6 +45,7 @@ class ColumnProfile:
 
 @dataclass(slots=True)
 class DatasetProfile:
+    """Deterministic profile artifact used by downstream validators."""
     source_path: Path
     file_name: str
     sheet_name: str | None
@@ -52,6 +55,7 @@ class DatasetProfile:
 
 
 def _to_safe_scalar(value: object) -> str | int | float | bool:
+    """Normalize scalar values so profile artifacts serialize deterministically."""
     if isinstance(value, bool):
         return value
     if isinstance(value, (np.integer, int)) and not isinstance(value, bool):
@@ -66,6 +70,7 @@ def _to_safe_scalar(value: object) -> str | int | float | bool:
 
 
 def _parse_bool(value: object) -> bool | None:
+    """Conservative boolean parser used before claiming boolean observed types."""
     if isinstance(value, bool):
         return value
     if isinstance(value, str):
@@ -76,6 +81,7 @@ def _parse_bool(value: object) -> bool | None:
 
 
 def _parse_int(value: object) -> int | None:
+    """Strict integer parser for full-column consistency checks."""
     if isinstance(value, bool):
         return None
     if isinstance(value, int):
@@ -92,6 +98,7 @@ def _parse_int(value: object) -> int | None:
 
 
 def _parse_number(value: object) -> float | None:
+    """Parse numeric candidates conservatively before claiming number types."""
     if isinstance(value, bool):
         return None
     if isinstance(value, (int, float)):
@@ -107,6 +114,7 @@ def _parse_number(value: object) -> float | None:
 
 
 def _parse_datetime(value: object) -> pd.Timestamp | None:
+    """Parse datetime candidates conservatively for stable inferred typing."""
     if isinstance(value, (pd.Timestamp, datetime, date)):
         return pd.Timestamp(value)
     if isinstance(value, str):
