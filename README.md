@@ -12,7 +12,7 @@ Contract conformance is a reproducibility problem, not just a summarization prob
 
 ## Why not just ask an LLM?
 
-An LLM can help with wording, but it should not decide contract truth. This project keeps deterministic validators as the authority layer.
+An LLM can help with wording, but it should not decide contract truth when you need close to 100% accuracy. This project keeps deterministic validators as the authority layer.
 
 ## What this project demonstrates
 
