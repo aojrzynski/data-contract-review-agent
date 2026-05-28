@@ -55,6 +55,7 @@ def run_review_mode(
     contract: DataContract,
     validation_artifacts: dict[str, Path],
 ) -> ReviewModeResult:
+    """Orchestrate deterministic review outputs into grouped recommendations."""
     recommendations = _build_recommendations(classified_result, suggested_updates)
     findings_total = len(validation_result.findings)
 

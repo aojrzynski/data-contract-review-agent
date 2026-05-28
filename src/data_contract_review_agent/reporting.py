@@ -27,6 +27,7 @@ def build_markdown_validation_report(
     profile: DatasetProfile,
     contract: DataContract,
 ) -> str:
+    """Render a reviewer-friendly markdown report from deterministic outputs."""
     _ = profile
     severity_counts: Counter[str] = Counter(f.severity for f in validation_result.findings)
     compatibility_counts: Counter[str] = Counter(c.compatibility for c in classified_result.classifications)

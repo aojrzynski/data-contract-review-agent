@@ -16,7 +16,8 @@
 
 ## Possible next steps
 
-- Richer sample domains beyond customer data.
+- Larger, more realistic sample datasets with wider schemas and more rows.
+- Additional sample domains beyond customer master data.
 - Row-level evidence exports for selected validators.
 - HTML report output for easier sharing.
 - Contract diff/apply workflow with explicit human approval.

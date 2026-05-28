@@ -1,4 +1,8 @@
-"""Contract loading and structural validation."""
+"""Contract loading and structural validation.
+
+This layer verifies contract shape and allowed field values before runtime
+dataset validation begins.
+"""
 
 from __future__ import annotations
 
@@ -52,6 +56,7 @@ def _read_contract_dict(path: Path) -> dict[str, Any]:
 
 
 def load_contract(path: str | Path) -> DataContract:
+    """Load a contract file into typed models after structural checks."""
     source_path = Path(path)
     if not source_path.exists():
         raise FileNotFoundError(f"Contract file not found: {source_path}")

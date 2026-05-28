@@ -47,6 +47,7 @@ def _finding_id(rule_type: str, columns: list[str]) -> str:
 
 
 def validate_required_columns(dataframe: pd.DataFrame, profile: DatasetProfile, contract: DataContract) -> list[ValidationFinding]:
+    """Check required column presence and emit deterministic findings."""
     findings: list[ValidationFinding] = []
     available = list(dataframe.columns)
     for column_name, column_rule in contract.columns.items():
@@ -68,6 +69,7 @@ def validate_required_columns(dataframe: pd.DataFrame, profile: DatasetProfile, 
 
 
 def validate_unexpected_columns(dataframe: pd.DataFrame, profile: DatasetProfile, contract: DataContract) -> list[ValidationFinding]:
+    """Flag columns not declared in contract when schema expansion is disallowed."""
     if contract.schema.allow_unexpected_columns:
         return []
     declared = set(contract.columns.keys())

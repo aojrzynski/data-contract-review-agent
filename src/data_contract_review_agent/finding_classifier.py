@@ -92,6 +92,7 @@ def _classify_finding(finding: ValidationFinding) -> FindingClassification:
 
 
 def classify_validation_result(result: ValidationResult) -> ClassifiedValidationResult:
+    """Attach triage metadata after validation without altering findings."""
     classifications = [_classify_finding(finding) for finding in result.findings]
     return ClassifiedValidationResult(
         contract_name=result.contract_name,
