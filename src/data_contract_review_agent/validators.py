@@ -93,6 +93,7 @@ def validate_unexpected_columns(dataframe: pd.DataFrame, profile: DatasetProfile
 
 
 def validate_type_expectations(dataframe: pd.DataFrame, profile: DatasetProfile, contract: DataContract) -> list[ValidationFinding]:
+    """Check declared logical types against conservative observed profile types."""
     compatible = {
         "date": {"date"},
         "datetime": {"datetime", "date"},
@@ -127,6 +128,7 @@ def validate_type_expectations(dataframe: pd.DataFrame, profile: DatasetProfile,
 
 
 def validate_nullability(dataframe: pd.DataFrame, profile: DatasetProfile, contract: DataContract) -> list[ValidationFinding]:
+    """Check non-nullable columns for null evidence that breaks downstream assumptions."""
     findings: list[ValidationFinding] = []
     for name, rule in contract.columns.items():
         if name not in dataframe.columns or rule.nullable:
@@ -206,6 +208,7 @@ def _evaluate_uniqueness(
 def validate_uniqueness(
     dataframe: pd.DataFrame, profile: DatasetProfile, contract: DataContract, max_examples: int = 20
 ) -> list[ValidationFinding]:
+    """Run column and multi-column uniqueness checks and emit duplicate-key evidence."""
     findings: list[ValidationFinding] = []
     for name, column_rule in contract.columns.items():
         if column_rule.unique:
@@ -236,6 +239,7 @@ def validate_uniqueness(
 
 
 def validate_allowed_values(dataframe: pd.DataFrame, profile: DatasetProfile, contract: DataContract, max_examples: int = 20) -> list[ValidationFinding]:
+    """Check domain constraints by flagging values outside declared allowed sets."""
     findings = []
     for name, rule in contract.columns.items():
         if name not in dataframe.columns or not rule.allowed_values:
@@ -266,6 +270,7 @@ def validate_allowed_values(dataframe: pd.DataFrame, profile: DatasetProfile, co
 
 
 def validate_numeric_range(dataframe: pd.DataFrame, profile: DatasetProfile, contract: DataContract) -> list[ValidationFinding]:
+    """Check numeric min/max bounds to catch value drift beyond contract thresholds."""
     findings = []
     for name, rule in contract.columns.items():
         if name not in dataframe.columns or (rule.min is None and rule.max is None):
@@ -300,6 +305,7 @@ def validate_numeric_range(dataframe: pd.DataFrame, profile: DatasetProfile, con
 
 
 def validate_pattern(dataframe: pd.DataFrame, profile: DatasetProfile, contract: DataContract, max_examples: int = 20) -> list[ValidationFinding]:
+    """Validate string formats with regex rules and report representative mismatches."""
     findings = []
     for name, rule in contract.columns.items():
         if name not in dataframe.columns or not rule.pattern:
@@ -346,6 +352,7 @@ def validate_pattern(dataframe: pd.DataFrame, profile: DatasetProfile, contract:
 
 
 def validate_length(dataframe: pd.DataFrame, profile: DatasetProfile, contract: DataContract) -> list[ValidationFinding]:
+    """Check string length constraints to enforce identifier and format expectations."""
     findings = []
     for name, rule in contract.columns.items():
         if name not in dataframe.columns or (rule.min_length is None and rule.max_length is None):
@@ -379,6 +386,7 @@ def validate_length(dataframe: pd.DataFrame, profile: DatasetProfile, contract: 
 
 
 def validate_freshness(dataframe: pd.DataFrame, profile: DatasetProfile, contract: DataContract, reference_date: date) -> list[ValidationFinding]:
+    """Check date/datetime recency against contract freshness windows deterministically."""
     findings = []
     for name, rule in contract.columns.items():
         if name not in dataframe.columns or not rule.freshness:
@@ -430,6 +438,7 @@ def validate_freshness(dataframe: pd.DataFrame, profile: DatasetProfile, contrac
 
 
 def validate_row_count(dataframe: pd.DataFrame, profile: DatasetProfile, contract: DataContract) -> list[ValidationFinding]:
+    """Check dataset volume against configured row-count bounds for operational sanity."""
     if contract.row_count is None or (contract.row_count.min is None and contract.row_count.max is None):
         return []
     rows = profile.row_count

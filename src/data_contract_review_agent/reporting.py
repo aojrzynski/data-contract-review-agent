@@ -38,6 +38,7 @@ def build_markdown_validation_report(
         for f in validation_result.findings
     )
 
+    # Overall status is derived from deterministic findings/classifications, not LLM or review-mode judgment.
     if has_failed:
         overall_status = "Failed"
     elif has_review_needed:

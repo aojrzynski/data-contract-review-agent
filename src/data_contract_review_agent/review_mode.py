@@ -101,6 +101,7 @@ def _build_recommendations(
     classified_result: ClassifiedValidationResult,
     suggested_updates: SuggestedContractUpdates,
 ) -> list[ReviewRecommendation]:
+    """Group existing classifications/suggestions into actions without creating new evidence."""
     by_rule_type: dict[str, list[str]] = {}
     for finding in classified_result.classifications:
         by_rule_type.setdefault(finding.rule_type, []).append(finding.finding_id)
