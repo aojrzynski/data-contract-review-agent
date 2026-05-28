@@ -30,7 +30,7 @@ This project writes traceable artifacts so both humans and automation can inspec
 ## `agent_review_report.md`
 - **What it is:** Human-readable report from deterministic review-mode orchestration.
 - **Who it is for:** Stakeholders who want grouped recommendations and plain-English context.
-- **When to use it:** Decision meetings and portfolio demos.
+- **When to use it:** Decision meetings and project demos.
 
 ## `agent_trace.json`
 - **What it is:** Structured trace of review-mode orchestration steps.

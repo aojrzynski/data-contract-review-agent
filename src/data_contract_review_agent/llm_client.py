@@ -1,4 +1,8 @@
-"""Minimal OpenAI client wrappers for optional LLM summary polish."""
+"""Minimal OpenAI wrappers for optional LLM summary polish.
+
+OpenAI is an optional boundary: imports are lazy and failures fall back to
+deterministic summaries so core validation behavior remains unchanged.
+"""
 
 from __future__ import annotations
 

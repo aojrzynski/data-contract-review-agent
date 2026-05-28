@@ -60,3 +60,6 @@ python -m data_contract_review_agent.cli --input sample_data/customers/customers
 ```
 
 If `OPENAI_API_KEY` is missing, the command still succeeds and writes a deterministic fallback `llm_summary.md`. The summary is optional wording polish and does not change validation evidence, recommendations, or exit codes.
+
+
+For the provided failing sample, expect 8 findings total (5 errors, 3 warnings), with one uniqueness violation.

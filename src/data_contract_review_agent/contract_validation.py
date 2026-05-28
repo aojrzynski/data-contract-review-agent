@@ -1,4 +1,4 @@
-"""Contract validation orchestration."""
+"""Deterministic orchestration point for contract validators."""
 
 from __future__ import annotations
 

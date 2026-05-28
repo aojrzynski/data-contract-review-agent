@@ -1,4 +1,4 @@
-"""Deterministic validator checks for dataset-vs-contract validation."""
+"""Deterministic, evidence-producing checks for dataset-vs-contract validation."""
 
 from __future__ import annotations
 
@@ -32,6 +32,7 @@ def _severity(
     column: ColumnContract | None = None,
     rule_severity: str | None = None,
 ) -> str:
+    # Severity precedence: column override > rule override > dataset defaults > global defaults.
     if column and column.severity:
         return column.severity
     if rule_severity:
@@ -40,6 +41,7 @@ def _severity(
 
 
 def _finding_id(rule_type: str, columns: list[str]) -> str:
+    # Finding IDs are deterministic so findings remain traceable across reruns.
     suffix = "_".join(columns) if columns else "dataset"
     return f"{rule_type}:{suffix}"
 
@@ -241,12 +243,23 @@ def validate_allowed_values(dataframe: pd.DataFrame, profile: DatasetProfile, co
         if invalid.empty:
             continue
         counts = invalid.value_counts().head(max_examples)
-        findings.append(ValidationFinding(
-            finding_id=_finding_id("allowed_values_violation", [name]), rule_type="allowed_values_violation", column=name, columns=[name],
-            severity=_severity(contract, "allowed_values_violation", column=rule), status="failed",
-            message=f"Column '{name}' contains values outside the allowed set.",
-            evidence={"allowed_values": list(rule.allowed_values), "unexpected_values": {str(k): int(v) for k, v in counts.items()}, "failed_row_count": int(invalid.shape[0])},
-            suggested_action="Update the data values or expand allowed_values in the contract."))
+        findings.append(
+            ValidationFinding(
+                finding_id=_finding_id("allowed_values_violation", [name]),
+                rule_type="allowed_values_violation",
+                column=name,
+                columns=[name],
+                severity=_severity(contract, "allowed_values_violation", column=rule),
+                status="failed",
+                message=f"Column '{name}' contains values outside the allowed set.",
+                evidence={
+                    "allowed_values": list(rule.allowed_values),
+                    "unexpected_values": {str(k): int(v) for k, v in counts.items()},
+                    "failed_row_count": int(invalid.shape[0]),
+                },
+                suggested_action="Update the data values or expand allowed_values in the contract.",
+            )
+        )
     return findings
 
 
@@ -261,12 +274,26 @@ def validate_numeric_range(dataframe: pd.DataFrame, profile: DatasetProfile, con
         above = int((valid > rule.max).sum()) if rule.max is not None else 0
         if below == 0 and above == 0:
             continue
-        findings.append(ValidationFinding(
-            finding_id=_finding_id("range_violation", [name]), rule_type="range_violation", column=name, columns=[name],
-            severity=_severity(contract, "range_violation", column=rule), status="failed",
-            message=f"Column '{name}' violates numeric range constraints.",
-            evidence={"min_allowed": rule.min, "max_allowed": rule.max, "observed_min": valid.min() if not valid.empty else None, "observed_max": valid.max() if not valid.empty else None, "below_min_count": below, "above_max_count": above},
-            suggested_action="Clamp, clean, or correct out-of-range values in the dataset."))
+        findings.append(
+            ValidationFinding(
+                finding_id=_finding_id("range_violation", [name]),
+                rule_type="range_violation",
+                column=name,
+                columns=[name],
+                severity=_severity(contract, "range_violation", column=rule),
+                status="failed",
+                message=f"Column '{name}' violates numeric range constraints.",
+                evidence={
+                    "min_allowed": rule.min,
+                    "max_allowed": rule.max,
+                    "observed_min": valid.min() if not valid.empty else None,
+                    "observed_max": valid.max() if not valid.empty else None,
+                    "below_min_count": below,
+                    "above_max_count": above,
+                },
+                suggested_action="Clamp, clean, or correct out-of-range values in the dataset.",
+            )
+        )
     return findings
 
 
@@ -278,22 +305,41 @@ def validate_pattern(dataframe: pd.DataFrame, profile: DatasetProfile, contract:
         try:
             regex = re.compile(rule.pattern)
         except re.error as exc:
-            findings.append(ValidationFinding(
-                finding_id=_finding_id("pattern_violation", [name]), rule_type="pattern_violation", column=name, columns=[name],
-                severity=_severity(contract, "pattern_violation", column=rule), status="skipped",
-                message=f"Pattern check skipped for column '{name}' because regex is invalid.",
-                evidence={"pattern": rule.pattern, "error": str(exc)}, suggested_action="Fix the contract regex pattern."))
+            findings.append(
+                ValidationFinding(
+                    finding_id=_finding_id("pattern_violation", [name]),
+                    rule_type="pattern_violation",
+                    column=name,
+                    columns=[name],
+                    severity=_severity(contract, "pattern_violation", column=rule),
+                    status="skipped",
+                    message=f"Pattern check skipped for column '{name}' because regex is invalid.",
+                    evidence={"pattern": rule.pattern, "error": str(exc)},
+                    suggested_action="Fix the contract regex pattern.",
+                )
+            )
             continue
         values = dataframe[name].dropna().astype(str)
         failed = values[~values.map(lambda value: bool(regex.fullmatch(value)))]
         if failed.empty:
             continue
-        findings.append(ValidationFinding(
-            finding_id=_finding_id("pattern_violation", [name]), rule_type="pattern_violation", column=name, columns=[name],
-            severity=_severity(contract, "pattern_violation", column=rule), status="warning",
-            message=f"Column '{name}' contains values that do not match the required pattern.",
-            evidence={"pattern": rule.pattern, "failed_row_count": int(failed.shape[0]), "sample_failed_values": failed.head(max_examples).tolist()},
-            suggested_action="Correct source values or adjust the contract regex."))
+        findings.append(
+            ValidationFinding(
+                finding_id=_finding_id("pattern_violation", [name]),
+                rule_type="pattern_violation",
+                column=name,
+                columns=[name],
+                severity=_severity(contract, "pattern_violation", column=rule),
+                status="warning",
+                message=f"Column '{name}' contains values that do not match the required pattern.",
+                evidence={
+                    "pattern": rule.pattern,
+                    "failed_row_count": int(failed.shape[0]),
+                    "sample_failed_values": failed.head(max_examples).tolist(),
+                },
+                suggested_action="Correct source values or adjust the contract regex.",
+            )
+        )
     return findings
 
 
@@ -307,12 +353,26 @@ def validate_length(dataframe: pd.DataFrame, profile: DatasetProfile, contract: 
         too_long = int((lengths > rule.max_length).sum()) if rule.max_length is not None else 0
         if too_short == 0 and too_long == 0:
             continue
-        findings.append(ValidationFinding(
-            finding_id=_finding_id("length_violation", [name]), rule_type="length_violation", column=name, columns=[name],
-            severity=_severity(contract, "length_violation", column=rule), status="failed",
-            message=f"Column '{name}' violates string length constraints.",
-            evidence={"min_length": rule.min_length, "max_length": rule.max_length, "observed_min_length": int(lengths.min()) if not lengths.empty else None, "observed_max_length": int(lengths.max()) if not lengths.empty else None, "too_short_count": too_short, "too_long_count": too_long},
-            suggested_action="Trim, pad, or validate values to meet length constraints."))
+        findings.append(
+            ValidationFinding(
+                finding_id=_finding_id("length_violation", [name]),
+                rule_type="length_violation",
+                column=name,
+                columns=[name],
+                severity=_severity(contract, "length_violation", column=rule),
+                status="failed",
+                message=f"Column '{name}' violates string length constraints.",
+                evidence={
+                    "min_length": rule.min_length,
+                    "max_length": rule.max_length,
+                    "observed_min_length": int(lengths.min()) if not lengths.empty else None,
+                    "observed_max_length": int(lengths.max()) if not lengths.empty else None,
+                    "too_short_count": too_short,
+                    "too_long_count": too_long,
+                },
+                suggested_action="Trim, pad, or validate values to meet length constraints.",
+            )
+        )
     return findings
 
 
@@ -323,23 +383,47 @@ def validate_freshness(dataframe: pd.DataFrame, profile: DatasetProfile, contrac
             continue
         parsed = pd.to_datetime(dataframe[name], errors="coerce").dropna()
         if parsed.empty:
-            findings.append(ValidationFinding(
-                finding_id=_finding_id("freshness_violation", [name]), rule_type="freshness_violation", column=name, columns=[name],
-                severity=_severity(contract, "freshness_violation", column=rule), status="skipped",
-                message=f"Freshness check skipped for column '{name}' because no parseable datetime values were found.",
-                evidence={"latest_value": None, "reference_date": reference_date.isoformat(), "max_age_days": rule.freshness.max_age_days, "observed_age_days": None},
-                suggested_action="Provide parseable date/datetime values for freshness checks."))
+            findings.append(
+                ValidationFinding(
+                    finding_id=_finding_id("freshness_violation", [name]),
+                    rule_type="freshness_violation",
+                    column=name,
+                    columns=[name],
+                    severity=_severity(contract, "freshness_violation", column=rule),
+                    status="skipped",
+                    message=f"Freshness check skipped for column '{name}' because no parseable datetime values were found.",
+                    evidence={
+                        "latest_value": None,
+                        "reference_date": reference_date.isoformat(),
+                        "max_age_days": rule.freshness.max_age_days,
+                        "observed_age_days": None,
+                    },
+                    suggested_action="Provide parseable date/datetime values for freshness checks.",
+                )
+            )
             continue
         latest = pd.Timestamp(parsed.max())
         age_days = (reference_date - latest.date()).days
         if age_days <= rule.freshness.max_age_days:
             continue
-        findings.append(ValidationFinding(
-            finding_id=_finding_id("freshness_violation", [name]), rule_type="freshness_violation", column=name, columns=[name],
-            severity=_severity(contract, "freshness_violation", column=rule), status="warning",
-            message=f"Column '{name}' is older than the allowed freshness window.",
-            evidence={"latest_value": latest.isoformat(), "reference_date": reference_date.isoformat(), "max_age_days": rule.freshness.max_age_days, "observed_age_days": age_days},
-            suggested_action="Refresh the dataset with newer records."))
+        findings.append(
+            ValidationFinding(
+                finding_id=_finding_id("freshness_violation", [name]),
+                rule_type="freshness_violation",
+                column=name,
+                columns=[name],
+                severity=_severity(contract, "freshness_violation", column=rule),
+                status="warning",
+                message=f"Column '{name}' is older than the allowed freshness window.",
+                evidence={
+                    "latest_value": latest.isoformat(),
+                    "reference_date": reference_date.isoformat(),
+                    "max_age_days": rule.freshness.max_age_days,
+                    "observed_age_days": age_days,
+                },
+                suggested_action="Refresh the dataset with newer records.",
+            )
+        )
     return findings
 
 
@@ -353,9 +437,20 @@ def validate_row_count(dataframe: pd.DataFrame, profile: DatasetProfile, contrac
     is_high = max_allowed is not None and rows > max_allowed
     if not is_low and not is_high:
         return []
-    return [ValidationFinding(
-        finding_id=_finding_id("row_count_violation", []), rule_type="row_count_violation", column=None, columns=[],
-        severity=_severity(contract, "row_count_violation", rule_severity=contract.row_count.severity), status="warning",
-        message="Dataset row count is outside configured bounds.",
-        evidence={"row_count": rows, "min_allowed": min_allowed, "max_allowed": max_allowed},
-        suggested_action="Adjust extraction volume or update row_count bounds in the contract.")]
+    return [
+        ValidationFinding(
+            finding_id=_finding_id("row_count_violation", []),
+            rule_type="row_count_violation",
+            column=None,
+            columns=[],
+            severity=_severity(
+                contract,
+                "row_count_violation",
+                rule_severity=contract.row_count.severity,
+            ),
+            status="warning",
+            message="Dataset row count is outside configured bounds.",
+            evidence={"row_count": rows, "min_allowed": min_allowed, "max_allowed": max_allowed},
+            suggested_action="Adjust extraction volume or update row_count bounds in the contract.",
+        )
+    ]
