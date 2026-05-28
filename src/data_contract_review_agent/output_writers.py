@@ -1,4 +1,8 @@
-"""Output artifact writing for validation results."""
+"""Output artifact writing for validation results.
+
+Writers emit both human-readable and machine-readable artifacts from the same
+deterministic evidence.
+"""
 
 from __future__ import annotations
 
@@ -27,6 +31,7 @@ def write_validation_outputs(
     profile: DatasetProfile,
     contract: DataContract,
 ) -> dict[str, Path]:
+    """Persist the complete validate-mode artifact set in one output directory."""
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
@@ -65,6 +70,7 @@ def _write_results_json(
     classified_result: ClassifiedValidationResult,
     suggested_updates: SuggestedContractUpdates,
 ) -> None:
+    """Write the full machine-readable validation result payload for automation."""
     payload = {
         "contract_name": validation_result.contract_name,
         "dataset_name": validation_result.dataset_name,
@@ -86,6 +92,7 @@ def _write_results_json(
 
 
 def _write_failures_csv(output_path: Path, validation_result: ValidationResult, classified_result: ClassifiedValidationResult) -> None:
+    """Write finding-level triage rows for spreadsheet-style review workflows."""
     headers = [
         "finding_id",
         "rule_type",
@@ -126,6 +133,7 @@ def _write_failures_csv(output_path: Path, validation_result: ValidationResult, 
 
 
 def _write_suggested_updates_yaml(output_path: Path, suggested_updates: SuggestedContractUpdates) -> None:
+    """Write advisory, non-mutating contract update suggestions for human governance."""
     payload = {
         "contract_name": suggested_updates.contract_name,
         "dataset_name": suggested_updates.dataset_name,

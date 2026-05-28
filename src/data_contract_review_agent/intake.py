@@ -1,4 +1,4 @@
-"""Dataset intake functions."""
+"""Dataset intake functions for loading tabular files with basic guardrails."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ SUPPORTED_DATASET_EXTENSIONS = {".csv", ".xlsx", ".xlsm"}
 
 
 def load_dataset(path: str | Path, sheet: str | None = None) -> tuple[pd.DataFrame, DatasetMetadata]:
-    """Load CSV/XLSX/XLSM data and return dataframe with intake metadata."""
+    """Load a supported dataset and return both rows and stable intake metadata."""
     source_path = Path(path)
     if not source_path.exists():
         raise FileNotFoundError(f"Dataset file not found: {source_path}")

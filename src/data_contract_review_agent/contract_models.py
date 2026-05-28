@@ -1,4 +1,8 @@
-"""Typed models used by the data contract review agent."""
+"""Typed models shared by intake, validation, reporting, and tests.
+
+These dataclasses are intentionally small and explicit so every pipeline stage
+can exchange the same structures without hidden behavior.
+"""
 
 from __future__ import annotations
 

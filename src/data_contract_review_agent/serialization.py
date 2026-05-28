@@ -13,7 +13,7 @@ from data_contract_review_agent.contract_models import ValidationFinding
 
 
 def make_json_safe(value: object) -> object:
-    """Recursively convert supported values into JSON-safe Python primitives."""
+    """Recursively convert profile/finding objects into JSON-safe primitives."""
     if value is None:
         return None
     if isinstance(value, (str, bool, int)):

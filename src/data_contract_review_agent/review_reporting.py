@@ -6,6 +6,7 @@ from data_contract_review_agent.review_mode import ReviewModeResult
 
 
 def build_agent_review_report(review_result: ReviewModeResult) -> str:
+    """Render review-mode recommendations and step trace as markdown."""
     lines = [
         "# Agent Review Report",
         "",

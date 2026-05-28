@@ -118,6 +118,7 @@ def _parse_datetime(value: object) -> pd.Timestamp | None:
 
 
 def infer_observed_logical_type(series: pd.Series) -> str:
+    """Infer logical type conservatively to avoid over-claiming schema certainty."""
     non_null = series.dropna()
     if non_null.empty:
         return "empty"
@@ -161,6 +162,7 @@ def build_dataset_profile(
     sample_size: int = 5,
     top_values_limit: int = 5,
 ) -> DatasetProfile:
+    """Build observed evidence summaries without making contract judgments."""
     columns: dict[str, ColumnProfile] = {}
 
     for column_name in dataframe.columns:

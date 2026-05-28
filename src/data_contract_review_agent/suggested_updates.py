@@ -133,6 +133,7 @@ def build_suggested_contract_updates(
     profile: DatasetProfile,
     max_suggestions: int = 20,
 ) -> SuggestedContractUpdates:
+    """Generate advisory contract edits from findings; never mutate source contract."""
     _ = contract
     suggestions: list[SuggestedContractUpdate] = []
     for finding in result.findings:

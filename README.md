@@ -1,17 +1,18 @@
 # data-contract-review-agent
 
-A local-first CLI project for deterministic data contract validation and bounded review-mode orchestration.
+The Data Contract Review Agent helps answer a simple question: does a dataset match the rules the team agreed to follow?
 
-## Why this exists
+In many data projects, those rules include expected columns, nullability, unique IDs, allowed values, formats, ranges, freshness windows, and row count bounds. A contract is useful documentation, but it only becomes trustworthy when those expectations are checked consistently against real data.
 
-Data contracts are only useful when they can be checked consistently against real datasets. This project demonstrates a practical pattern:
-- deterministic validation for pass/fail evidence,
-- bounded orchestration for review readability,
-- optional LLM polish that never becomes the authority layer.
+This project runs those checks locally and deterministically. It compares a dataset to a contract, then writes reviewable artifacts that show what passed, what failed, and what needs follow-up.
+
+## Why deterministic validation matters
+
+Contract conformance is a reproducibility problem, not just a summarization problem. If pass/fail evidence changes between runs without data changes, teams cannot rely on it for governance, CI, or audits.
 
 ## Why not just ask an LLM?
 
-Contract conformance is a reproducibility problem, not just a summarization problem. If pass/fail outcomes are not deterministic, teams cannot rely on them for governance, CI, or audits.
+An LLM can help with wording, but it should not decide contract truth. This project keeps deterministic validators as the authority layer.
 
 ## What this project demonstrates
 
@@ -24,6 +25,7 @@ Contract conformance is a reproducibility problem, not just a summarization prob
 
 - `validate` mode runs a deterministic evidence pipeline.
 - `review` mode coordinates findings, classifications, suggestions, and recommendations into a structured review outcome.
+- Recommendations are grouped for easier triage and each step is traceable in artifacts.
 - The agent does **not** decide truth independently from deterministic validators.
 - This is bounded orchestration, not open-ended autonomy.
 
@@ -108,5 +110,4 @@ python -m pytest
 - [Artifacts](docs/artifacts.md)
 - [Demo walkthrough](docs/demo_walkthrough.md)
 - [Example commands](docs/example_commands.md)
-- [Portfolio summary](docs/portfolio_summary.md)
 - [Roadmap](docs/roadmap.md)

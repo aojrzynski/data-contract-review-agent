@@ -22,6 +22,7 @@ def write_contract_trace(
     profile: DatasetProfile,
     contract: DataContract,
 ) -> Path:
+    """Write a compact trace payload that makes validate-mode orchestration auditable."""
     trace_payload = {
         "input_summary": {
             "contract_name": contract.contract.name,

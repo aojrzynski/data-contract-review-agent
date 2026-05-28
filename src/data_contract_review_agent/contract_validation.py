@@ -30,7 +30,7 @@ def validate_contract(
     reference_date: date | None = None,
     max_examples: int = 20,
 ) -> ValidationResult:
-    """Run deterministic validation checks against a loaded dataset and contract."""
+    """Run deterministic validators and aggregate evidence into one result object."""
     as_of_date = reference_date or date.today()
 
     findings = []

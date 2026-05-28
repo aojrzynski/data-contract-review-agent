@@ -32,6 +32,7 @@ def build_llm_summary_input(
     suggested_updates: SuggestedContractUpdates,
     review_result: ReviewModeResult | None = None,
 ) -> dict[str, object]:
+    """Build bounded summary payload with counts and guidance, not raw row evidence."""
     severity_counts = dict(sorted(Counter(f.severity for f in validation_result.findings).items()))
     rule_type_counts = dict(sorted(Counter(f.rule_type for f in validation_result.findings).items()))
     compatibility_counts = dict(sorted(Counter(c.compatibility for c in classified_result.classifications).items()))
@@ -87,6 +88,7 @@ def build_llm_summary_markdown(
     model: str | None = None,
     client: object | None = None,
 ) -> LLMSummaryResult:
+    """Return optional LLM-polished markdown, or deterministic fallback on unavailability."""
     chosen_model = model or DEFAULT_LLM_MODEL
     availability_reason: str | None = None
     if client is None:

@@ -20,6 +20,7 @@ class LLMClientAvailability:
 
 
 def create_openai_client() -> LLMClientAvailability:
+    """Create OpenAI client lazily so base validation works without LLM dependencies."""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         return LLMClientAvailability(client=None, reason="OPENAI_API_KEY is not set")
@@ -33,6 +34,7 @@ def create_openai_client() -> LLMClientAvailability:
 
 
 def call_openai_summary(client: object, prompt: str, model: str) -> str:
+    """Execute one summary call and return markdown text from the responses API."""
     response = client.responses.create(model=model, input=prompt)
     text = getattr(response, "output_text", None)
     if isinstance(text, str) and text.strip():
