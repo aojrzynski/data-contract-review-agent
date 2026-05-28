@@ -27,6 +27,7 @@ from data_contract_review_agent.contract_models import (
 
 
 def _validate_severity(value: str | None, field_name: str) -> None:
+    """Centralize severity vocabulary validation for all contract sections."""
     if value is not None and value not in SUPPORTED_SEVERITIES:
         raise ValueError(
             f"Invalid severity '{value}' for {field_name}. "
@@ -35,6 +36,7 @@ def _validate_severity(value: str | None, field_name: str) -> None:
 
 
 def _read_contract_dict(path: Path) -> dict[str, Any]:
+    """Read YAML/JSON contract payloads into a validated top-level dictionary."""
     extension = path.suffix.lower()
     try:
         if extension in {".yaml", ".yml"}:
@@ -56,13 +58,14 @@ def _read_contract_dict(path: Path) -> dict[str, Any]:
 
 
 def load_contract(path: str | Path) -> DataContract:
-    """Load a contract file into typed models after structural checks."""
+    """Load a contract file into typed models for deterministic validation."""
     source_path = Path(path)
     if not source_path.exists():
         raise FileNotFoundError(f"Contract file not found: {source_path}")
 
     raw = _read_contract_dict(source_path)
 
+    # contract metadata
     raw_contract = raw.get("contract")
     if not isinstance(raw_contract, dict):
         raise ValueError("Missing required 'contract' object.")
@@ -80,6 +83,7 @@ def load_contract(path: str | Path) -> DataContract:
         ),
     )
 
+    # dataset-level options and severity defaults
     raw_dataset = raw.get("dataset") or {}
     if not isinstance(raw_dataset, dict):
         raise ValueError("'dataset' must be an object when provided.")
@@ -96,6 +100,7 @@ def load_contract(path: str | Path) -> DataContract:
         severity_defaults=severity_defaults,
     )
 
+    # schema expectations
     raw_schema = raw.get("schema") or {}
     if not isinstance(raw_schema, dict):
         raise ValueError("'schema' must be an object when provided.")
@@ -103,6 +108,7 @@ def load_contract(path: str | Path) -> DataContract:
         allow_unexpected_columns=bool(raw_schema.get("allow_unexpected_columns", False))
     )
 
+    # column expectations
     raw_columns = raw.get("columns")
     if not isinstance(raw_columns, dict) or not raw_columns:
         raise ValueError("Missing required 'columns' section with at least one column.")
@@ -122,6 +128,7 @@ def load_contract(path: str | Path) -> DataContract:
         severity = raw_column.get("severity")
         _validate_severity(severity, f"columns.{column_name}.severity")
 
+        # freshness rules
         freshness_payload = raw_column.get("freshness")
         freshness_rule = None
         if freshness_payload is not None:
@@ -155,6 +162,7 @@ def load_contract(path: str | Path) -> DataContract:
             severity=severity,
         )
 
+    # row count rule
     row_count_rule = None
     raw_row_count = raw.get("row_count")
     if raw_row_count is not None:
@@ -172,6 +180,7 @@ def load_contract(path: str | Path) -> DataContract:
         _validate_severity(row_count_severity, "row_count.severity")
         row_count_rule = RowCountRule(min=min_rows, max=max_rows, severity=row_count_severity)
 
+    # uniqueness rules
     uniqueness_rules: list[UniquenessRule] = []
     raw_uniqueness = raw.get("uniqueness", [])
     if not isinstance(raw_uniqueness, list):

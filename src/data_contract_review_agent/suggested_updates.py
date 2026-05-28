@@ -14,6 +14,7 @@ from data_contract_review_agent.serialization import make_json_safe
 
 @dataclass(slots=True)
 class SuggestedContractUpdate:
+    """Advisory contract change prompt derived from deterministic evidence."""
     suggestion_id: str
     suggestion_type: str
     target_path: str
@@ -27,12 +28,14 @@ class SuggestedContractUpdate:
 
 @dataclass(slots=True)
 class SuggestedContractUpdates:
+    """Collection wrapper for suggested updates emitted by the pipeline."""
     contract_name: str
     dataset_name: str
     suggestions: list[SuggestedContractUpdate] = field(default_factory=list)
 
 
 def _build_update_from_finding(finding: ValidationFinding, profile: DatasetProfile) -> SuggestedContractUpdate | None:
+    """Map selected finding types to advisory review prompts, never auto-fixes."""
     column = finding.column
     suggestion_id = f"{finding.rule_type}:{column or 'dataset'}"
 

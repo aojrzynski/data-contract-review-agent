@@ -19,6 +19,7 @@ from data_contract_review_agent.contract_models import ValidationResult
 
 @dataclass(frozen=True)
 class LLMSummaryResult:
+    """LLM summary output plus fallback provenance for transparency."""
     used_llm: bool
     provider: str
     model: str | None
@@ -131,6 +132,7 @@ def build_llm_summary_markdown(
 
 
 def _build_prompt(summary_payload: dict[str, object]) -> str:
+    """Build bounded instructions that prevent invented findings or auto-edits."""
     payload_text = json.dumps(summary_payload, indent=2, sort_keys=True)
     return (
         "Write markdown with this exact structure:\n"
@@ -147,6 +149,7 @@ def _build_prompt(summary_payload: dict[str, object]) -> str:
 
 
 def _build_fallback_markdown(summary_payload: dict[str, object], reason: str) -> str:
+    """Return deterministic markdown when optional OpenAI generation is unavailable."""
     return (
         "# LLM-Polished Summary\n\n"
         "## Non-authoritative note\n"

@@ -13,6 +13,7 @@ from data_contract_review_agent.contract_models import ValidationFinding, Valida
 
 @dataclass(slots=True)
 class FindingClassification:
+    """Triage metadata attached to a finding without changing its evidence."""
     finding_id: str
     rule_type: str
     severity: str
@@ -26,6 +27,7 @@ class FindingClassification:
 
 @dataclass(slots=True)
 class ClassifiedValidationResult:
+    """Validation result plus deterministic classification labels for triage."""
     contract_name: str
     dataset_name: str
     row_count: int
@@ -34,6 +36,7 @@ class ClassifiedValidationResult:
 
 
 def _classify_finding(finding: ValidationFinding) -> FindingClassification:
+    """Map rule outcomes to deterministic compatibility and priority metadata."""
     if finding.status == "skipped":
         return FindingClassification(
             finding_id=finding.finding_id,
